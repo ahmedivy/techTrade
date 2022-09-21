@@ -1,0 +1,106 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    {%load crispy_forms_tags %} 
+    
+    <br><br><br><br>
+
+    <div class="container shadow-lg w-75">
+    <div class="row">
+        <div class="col-5 mt-5">
+            <img src="{{product.img}}" class="rounded mb-5" onerror="this.onerror=null; this.src='https://i.dlpng.com/static/png/6825249_preview.png'" alt="..." width=400 height=400>
+        </div>
+        <div class="col-7">
+            <h2 class="pb-3 mt-5 justify-content-center">{{product.title}}</h2>  
+            
+            <a href="#"><span class="badge badge-primary badge-pill">{{ product.category }}</span></a>
+                {%if product.bids.all.count == 0%}
+                <p class="text-primary mt-4">
+                <strong>Price: {{product.startBid}}$</strong></p>
+                {%else%}
+                <p class="text-primary mt-4">
+                <strong>Price: {{product.bids.first.amount}}$</strong></p>
+                {%endif%}
+            <p >{{product.desc}}</p>
+
+            {% if product.status == False %}
+            <p ><strong>{{product.bids.all.count}} bid(s) currently</strong></p>
+            {%else%}
+            <p> Auction Ended </p>
+            <p> The winner is <strong> {{product.bids.first.user.username}}</strong></p>
+            {%endif%}
+            
+            {% if request.user.is_authenticated and request.user != product.user and product.status == False %}
+            <form method="POST" action="{% url 'add_bid' product.id %}">
+                {% csrf_token %}
+                {{ bidform }}
+                <input type="hidden" name="id" value="{{product.id}}">
+                <button type="submit" class="btn btn-primary btn-sm mb-2">Bid</button>
+                {% if message %}
+                    <p class="text-danger"> {{message}} </p>
+                {% endif %}
+            </form>
+            {% endif %}
+
+           {% if request.user.is_authenticated and product.status == False%}
+            <div class="my-2">
+                <form method="POST" action="{% url 'watch_auction' product.id %}" class="form-inline">
+                    {% csrf_token%}
+                    {% if request.user in product.watchers.all %}
+                        <input class="btn btn-primary mt-2 btn-sm" type="submit" value="Remove from Watchlist" name="remove" />
+                    {% else %}
+                        <input class="btn btn-primary mt-2 btn-sm" type="submit" value="Add to Watchlist"  name="add"/>
+                    {% endif %}
+                </form>
+            </div>
+            {% endif %}
+
+
+            {% if request.user.is_authenticated %}
+            <div class="my-2">
+                <form method="POST" action="{% url 'end_auction' product.id %}" class="form-inline">
+                    {% csrf_token%}
+                    {% if request.user == product.user and product.status == False %}
+                        <input class="btn btn-danger mt-2 btn-sm" type="submit" value="End Auction" />
+                    {% endif %}
+                </form>
+            </div>
+            {% endif %}
+            <p ><small> Listed On: {{product.time}}</small></p>
+            <p class="text-danger"> Listed By: {{product.user.username}}</p>
+        </div>
+    
+    </div>
+    
+    <h2 class="text-primary m-4">Comments</h2>
+    <div class="row">
+        <div class="col-6">
+            {%if product.comments.all.count == 0%}
+            <h5 class="m-5"> No Comments </h5>
+            {%else%}
+                {%for comment in product.comments.all%}
+                <div class="card row m-3" style="width: 18rem;">
+                    <div class="card-body">
+                    <h5 class="card-title">{{comment.user.username}}</h5>
+                    <p class="card-text">{{comment.message}}</p>
+                    <h6 class="card-subtitle mb-2 text-muted"><small>On: {{comment.time}}</small></h6>
+                    </div>
+                </div>
+                {%endfor%}
+            {%endif%}
+        </div>
+        <div class="col-3">
+            {% if request.user.is_authenticated %}
+            <form method="POST" action="{% url 'add_comment' product.id %}">
+                {% csrf_token %}
+                {{ commentform | crispy }}
+                <button type="submit" class="btn btn-primary btn-sm mb-2">Comment</button>
+            </form>
+            {% endif %}
+        </div>
+    
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>{% block title %}techTrade{% endblock %}</title>
+		<link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	</head>
+	<body>
+
+		<nav class="navbar navbar-expand-xl navbar-primary bg-primary fixed-top">
+			<div class="container-fluid">
+			  	<a class="navbar-brand text-light" href="{% url 'index' %}">techTrade</a>
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0 text-light">
+					<li class="nav-item">
+						<a class="nav-link active text-light" aria-current="page" href="{% url 'index' %}">Home</a>
+					</li>
+					<li class="nav-item text-light">
+						<a class="nav-link active text-light" aria-current="page" href="{% url 'categories' %}">Categories</a>
+					</li>
+					{% if user.is_authenticated %}
+					<li class="nav-item text-light">
+						<a class="nav-link active text-light" aria-current="page" href="{% url 'watchlist' %}">Watchlist</a>
+					</li>
+					<li class="nav-item text-light">
+						<a class="nav-link active text-light" aria-current="page" href="{% url 'create' %}">Create Listing</a>
+					</li>
+					{% endif %}
+				</ul>
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						{% if user.is_authenticated %}
+					<li class="nav-item text-light">
+						<h6 class="nav-link active"> Logged In as <strong>{{ user.username }}</strong> </h6>
+					</li>
+						{% else %}
+					<li class="nav-item text-light">
+						<h6 class="nav-link active"> Not Logged In </h6>
+					</li>
+						{% endif %}
+						{% if user.is_authenticated %}
+					<li class="nav-item">
+						<a class="btn btn-outline-light ml-4 btn-sm mt-1" href="{% url 'logout' %}" role="button">Logout</a>
+					</li>
+						{% else %}
+					<li class="nav-item">
+						<a class="btn btn-outline-light btn-sm mr-4 ml-4 mt-1" href="{% url 'login' %}" role="button">Login</a>
+					</li>
+					<li class="nav-item">
+						<a class="btn btn-outline-light btn-sm mt-1" href="{% url 'register' %}" role="button">Register</a>
+					</li>
+						{% endif %}
+				</ul>
+			  	</div>
+			</div>
+		</nav>
+		<div>
+		{% block body %}
+		{% endblock %}
+		</div>
+	</body>
+</html>
