@@ -1,0 +1,2 @@
+# techTrade
+Django Web App
